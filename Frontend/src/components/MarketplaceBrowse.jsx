@@ -45,8 +45,8 @@ export default function MarketplaceBrowse({
   }
 
   return (
-    <section id="browse" className="scroll-mt-24 bg-white pb-20 text-[#252525]">
-      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-8">
+    <section id="browse" className="scroll-mt-20 bg-white pb-14 text-[#252525] sm:scroll-mt-24 sm:pb-20">
+      <div className="mx-auto w-full max-w-7xl min-w-0 px-4 pt-8 sm:px-6 lg:px-8">
         {/* Simple bookstore heading, inspired by traditional shopping pages */}
         <nav aria-label="Breadcrumb" className="mb-5 text-xs text-gray-500">
           <a href="#top" className="cursor-pointer hover:text-red-700">Home</a>
@@ -54,19 +54,18 @@ export default function MarketplaceBrowse({
           <span className="font-semibold text-gray-800">Books for Sale</span>
         </nav>
         <div className="border-b-2 border-[#1c1c1c] pb-5">
-          
           <h2 className="mt-2 text-3xl font-black uppercase tracking-tight sm:text-4xl">Books for Sale</h2>
           <p className="mt-2 max-w-2xl text-sm text-gray-600">
             Find affordable textbooks and secondhand reads from students on campus.
           </p>
         </div>
 
-        <div className="grid gap-7 pt-7 lg:grid-cols-[235px_minmax(0,1fr)] lg:gap-10">
+        <div className="grid min-w-0 grid-cols-1 gap-5 pt-6 lg:grid-cols-[235px_minmax(0,1fr)] lg:gap-10">
           {/* Mobile filter toggle */}
           <div className="lg:hidden">
             <button type="button" onClick={() => setFiltersOpen((x) => !x)}
               aria-expanded={filtersOpen} aria-controls="marketplace-filters"
-              className="flex w-full cursor-pointer items-center justify-between border border-gray-300 px-4 py-3 text-sm font-bold uppercase tracking-wide">
+              className="flex min-h-12 w-full cursor-pointer items-center justify-between border border-gray-300 px-4 py-3 text-sm font-bold uppercase tracking-wide focus-visible:outline-2 focus-visible:outline-red-700">
               Shopping Options <span aria-hidden="true">{filtersOpen ? '−' : '+'}</span>
             </button>
           </div>
@@ -94,7 +93,7 @@ export default function MarketplaceBrowse({
               <legend className="pt-5 text-xs font-extrabold uppercase tracking-wider">Price</legend>
               <div className="mt-3 space-y-3">
                 {priceOptions.map((opt) => (
-                  <label key={opt.value} className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+                  <label key={opt.value} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-gray-700">
                     <input type="radio" name="marketplace-price" value={opt.value}
                       checked={priceBand === opt.value} onChange={() => setPriceBand(opt.value)}
                       className="size-4 cursor-pointer accent-red-700" />
@@ -108,7 +107,7 @@ export default function MarketplaceBrowse({
               <legend className="pt-5 text-xs font-extrabold uppercase tracking-wider">Book Condition</legend>
               <div className="mt-3 space-y-3">
                 {conditions.map((item) => (
-                  <label key={item} className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+                  <label key={item} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-gray-700">
                     <input type="radio" name="marketplace-condition" value={item}
                       checked={condition === item} onChange={() => setCondition(item)}
                       className="size-4 cursor-pointer accent-red-700" />
@@ -134,14 +133,14 @@ export default function MarketplaceBrowse({
 
           {/* Results, search, sort, and book grid */}
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 pb-4">
+            <div className="flex min-w-0 flex-col items-start justify-between gap-3 border-b border-gray-200 pb-4 sm:flex-row sm:items-center">
               <p className="text-sm text-gray-600">
                 <strong className="font-bold text-gray-900">{results.length}</strong> book{results.length === 1 ? '' : 's'} found
               </p>
-              <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold">
+              <label className="flex w-full cursor-pointer flex-wrap items-center justify-between gap-2 text-sm font-semibold sm:w-auto sm:justify-start">
                 Sort by
                 <select value={sort} onChange={(e) => setSort(e.target.value)}
-                  className="max-w-48 cursor-pointer border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-red-700">
+                  className="min-h-11 max-w-full min-w-0 cursor-pointer border border-gray-300 bg-white px-3 py-2 text-base outline-none focus:border-red-700 sm:max-w-48 sm:text-sm">
                   <option value="featured">Featured</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
@@ -154,21 +153,21 @@ export default function MarketplaceBrowse({
               <span aria-hidden="true" className="pointer-events-none absolute left-4 top-3.5 text-gray-500">⌕</span>
               <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} maxLength={MAX}
                 aria-label="Search titles, subjects, or sellers" placeholder="Search books, subjects, or sellers..."
-                className="w-full rounded-none border border-gray-300 bg-[#fafafa] py-3 pl-10 pr-4 text-sm outline-none transition focus:border-red-700 focus:bg-white" />
+                className="min-h-12 w-full min-w-0 rounded-none border border-gray-300 bg-[#fafafa] py-3 pl-10 pr-4 text-base outline-none transition focus:border-red-700 focus:bg-white sm:text-sm" />
               <p className="mt-1 text-right text-[11px] text-gray-500">{search.length}/{MAX} characters</p>
             </div>
 
             {notice && <p role="status" className="my-5 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm text-gray-800">{notice}</p>}
 
             {results.length > 0 ? (
-              <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-5 xl:grid-cols-3">
+              <div className="mt-5 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
                 {results.map((book) => (
                   <BookCard key={book.id} book={book} favorite={saved.includes(book.id)}
                     onFavorite={toggleSaved} onView={setSelectedBook} />
                 ))}
               </div>
             ) : (
-              <div className="mt-5 border border-dashed border-gray-300 px-6 py-16 text-center">
+              <div className="mt-5 border border-dashed border-gray-300 px-4 py-12 text-center sm:px-6 sm:py-16">
                 <p className="text-3xl" aria-hidden="true">📚</p>
                 <h3 className="mt-3 text-xl font-bold">No books match your filters</h3>
                 <p className="mt-2 text-sm text-gray-500">Try another search, price range, or subject.</p>
