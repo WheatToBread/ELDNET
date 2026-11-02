@@ -140,8 +140,6 @@ export default function Home({ user, onLogout }) {
 
         <section className="bg-[#171F3C] px-4 py-12 text-white sm:px-6 sm:py-16 lg:px-8">
           <div className="mx-auto flex max-w-7xl min-w-0 flex-col items-start justify-between gap-7 md:flex-row md:items-center">
-            <div><p className="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-indigo-300">Pass it on</p><h2 className="max-w-xl font-serif text-3xl font-bold sm:text-4xl">Your old textbook could be someone else's next great find.</h2><p className="mt-3 max-w-lg text-sm text-slate-300">Create a listing in minutes. The posting form is a frontend preview until our backend is ready.</p></div>
-            <button type="button" onClick={() => setShowSell(true)} className="min-h-12 w-full cursor-pointer rounded-full bg-white px-7 py-3.5 text-sm font-bold text-slate-900 transition hover:bg-indigo-100 sm:w-auto">Post a Book ↗</button>
           </div>
         </section>
       </main>

@@ -7,9 +7,7 @@ export default function Footer() {
           <p className="mt-2 max-w-sm text-sm leading-6">Preloved textbooks. Better semesters. A student-to-student book marketplace.</p>
         </div>
         <div className="min-w-0 text-sm leading-7 md:text-right">
-          <p>Marketplace frontend prototype</p>
-          <p>Sample listings · no live purchases yet</p>
-          <p>Arrange any exchanges in school-approved places</p>
+          
         </div>
       </div>
     </footer>
