@@ -1,0 +1,15 @@
+# Visual Studio temporary files
+.vs/
+**/.vs/
+
+# Node.js dependencies
+node_modules/
+
+# Build files
+dist/
+bin/
+obj/
+
+# Environment files
+.env
+.env.local

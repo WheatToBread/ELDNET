@@ -1,0 +1,6 @@
+@Eldnet.Api_HostAddress = http://localhost:5245
+
+GET {{Eldnet.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
