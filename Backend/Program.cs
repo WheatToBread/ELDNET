@@ -1,3 +1,6 @@
+using Eldnet.Api.DTOs;
+using System.ComponentModel.DataAnnotations;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +17,22 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
+var RegisterDto = new RegisterDto
+{
+    FullName = "John Doe",
+    Email = "john@gmail.com",
+    Password = "123",
+    ConfirmPassword = "123!!"
+};
+
+var results = new List<ValidationResult>();
+bool isValid = Validator.TryValidateObject(RegisterDto, new ValidationContext(RegisterDto), results, true);
+Console.WriteLine($"Is RegisterDto valid? {isValid}");
+
+foreach(var result in results)
+{
+    Console.WriteLine($"Validation error: {result.ErrorMessage}");
+}
 
 var app = builder.Build();
 
