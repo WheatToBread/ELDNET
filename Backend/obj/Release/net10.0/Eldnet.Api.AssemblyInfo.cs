@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Eldnet.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9543e2a7a83a168e44349280c6bde7494bacbd3e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1586607937962112813f85c424dff2596316fd4f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Eldnet.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Eldnet.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
