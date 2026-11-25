@@ -1,15 +1,17 @@
-using Eldnet.Api.DTOs;
-using System.ComponentModel.DataAnnotations;
+using System.Text;
+using Eldnet.Api.Data;
+using Eldnet.Api.Models;
+using Eldnet.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// CORS: define the policy (must be before builder.Build())
+// CORS: allow the Vite dev server
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -17,38 +19,58 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
-var RegisterDto = new RegisterDto
-{
-    FullName = "John Doe",
-    Email = "john@gmail.com",
-    Password = "123",
-    ConfirmPassword = "123!!"
-};
 
-var results = new List<ValidationResult>();
-bool isValid = Validator.TryValidateObject(RegisterDto, new ValidationContext(RegisterDto), results, true);
-Console.WriteLine($"Is RegisterDto valid? {isValid}");
+// Database (SQLite file: eldnet.db)
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-foreach(var result in results)
+// Identity: users + password hashing
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {
-    Console.WriteLine($"Validation error: {result.ErrorMessage}");
-}
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false; // matches the 8-char rule in RegisterDto
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+// JWT authentication
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false; // keep claim names like "sub" as-is
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Create/update the database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
-// CORS: apply the policy (after redirection, before authorization)
 app.UseCors("Frontend");
-
-app.UseAuthorization();
-
+app.UseAuthentication();   // who are you?  (must come before authorization)
+app.UseAuthorization();    // are you allowed?
 app.MapControllers();
 
 app.Run();

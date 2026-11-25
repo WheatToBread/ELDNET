@@ -1,6 +1,41 @@
-@Eldnet.Api_HostAddress = http://localhost:5245
+@host = https://localhost:PORT
 
-GET {{Eldnet.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Register
+POST {{host}}/api/auth/register
+Content-Type: application/json
 
-###
+{
+  "fullName": "John Doe",
+  "email": "john@gmail.com",
+  "password": "Test1234",
+  "confirmPassword": "Test1234"
+}
+
+### Login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@gmail.com",
+  "password": "Test1234"
+}
+
+### Me (paste the token from login)
+GET {{host}}/api/auth/me
+Authorization: Bearer PASTE_TOKEN_HERE
+
+### Books (public)
+GET {{host}}/api/books
+
+### Create book (needs token)
+POST {{host}}/api/books
+Authorization: Bearer PASTE_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Clean Code",
+  "author": "Robert Martin",
+  "price": 25.5,
+  "condition": "Used",
+  "description": "Good shape"
+}

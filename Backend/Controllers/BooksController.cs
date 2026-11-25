@@ -1,5 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
+using Eldnet.Api.Data;
+using Eldnet.Api.DTOs;
 using Eldnet.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eldnet.Api.Controllers;
 
@@ -7,69 +12,82 @@ namespace Eldnet.Api.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private static readonly List<Book> books = new()
-    {
-        new Book { Id = 1, Title = "Book 1", Price = 9.99m, Author = "Author 1", Condition = "New", Description = "Description" },
-        new Book { Id = 2, Title = "Book 2", Price = 14.99m, Author = "Author 2", Condition = "Used", Description = "Description" },
-        new Book { Id = 3, Title = "Book 3", Price = 19.99m, Author = "Author 3", Condition = "New", Description = "Description" }
-    };
+    private readonly ApplicationDbContext _db;
 
-    [HttpGet]
-    public ActionResult<List<Book>> GetAll()
+    public BooksController(ApplicationDbContext db)
     {
-        return books;
+        _db = db;
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Book> GetById(int id)
+    private string? CurrentUserId => User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+    // GET api/books  (public: BrowseBooks page)
+    [HttpGet]
+    public async Task<ActionResult<List<Book>>> GetAll()
     {
-        var book = books.FirstOrDefault(b => b.Id == id);
-        if (book == null)
-        {
-            return NotFound();
-        }
+        return await _db.Books.AsNoTracking().OrderBy(b => b.Id).ToListAsync();
+    }
+
+    // GET api/books/2  (public: BookDetails page)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Book>> GetById(int id)
+    {
+        var book = await _db.Books.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+        if (book == null) return NotFound();
         return book;
     }
 
-    // POST api/books  (used by SellBook page)
+    // POST api/books  (SellBook page; must be logged in)
+    [Authorize]
     [HttpPost]
-    public ActionResult<Book> Create(Book newBook)
+    public async Task<ActionResult<Book>> Create(BookDto dto)
     {
-        newBook.Id = books.Count == 0 ? 1 : books.Max(b => b.Id) + 1;
-        books.Add(newBook);
-        return CreatedAtAction(nameof(GetById), new { id = newBook.Id }, newBook);
+        var book = new Book
+        {
+            Title = dto.Title,
+            Author = dto.Author,
+            Price = dto.Price,
+            Condition = dto.Condition,
+            Description = dto.Description,
+            SellerId = CurrentUserId
+        };
+
+        _db.Books.Add(book);
+        await _db.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
     }
 
-    // PUT api/books/2
+    // PUT api/books/2  (only the seller can edit)
+    [Authorize]
     [HttpPut("{id}")]
-    public IActionResult Update(int id, Book updatedBook)
+    public async Task<IActionResult> Update(int id, BookDto dto)
     {
-        var book = books.FirstOrDefault(b => b.Id == id);
-        if (book == null)
-        {
-            return NotFound();
-        }
+        var book = await _db.Books.FindAsync(id);
+        if (book == null) return NotFound();
+        if (book.SellerId != CurrentUserId) return Forbid();
 
-        book.Title = updatedBook.Title;
-        book.Author = updatedBook.Author;
-        book.Price = updatedBook.Price;
-        book.Condition = updatedBook.Condition;
-        book.Description = updatedBook.Description;
+        book.Title = dto.Title;
+        book.Author = dto.Author;
+        book.Price = dto.Price;
+        book.Condition = dto.Condition;
+        book.Description = dto.Description;
 
+        await _db.SaveChangesAsync();
         return NoContent();
     }
 
-    // DELETE api/books/2
+    // DELETE api/books/2  (only the seller can delete)
+    [Authorize]
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var book = books.FirstOrDefault(b => b.Id == id);
-        if (book == null)
-        {
-            return NotFound();
-        }
+        var book = await _db.Books.FindAsync(id);
+        if (book == null) return NotFound();
+        if (book.SellerId != CurrentUserId) return Forbid();
 
-        books.Remove(book);
+        _db.Books.Remove(book);
+        await _db.SaveChangesAsync();
         return NoContent();
     }
 }
